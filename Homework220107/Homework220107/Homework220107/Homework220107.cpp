@@ -2,19 +2,63 @@
 //
 
 #include <iostream>
+#include <string>
+#include <regex>
+#include <vector>
+
+// 문자열 분리
+std::vector<std::string> split(std::string s, std::string pattern = " ")
+{
+	std::regex re(pattern);
+	std::sregex_token_iterator it(s.begin(), s.end(), re, -1), end;
+	return std::vector<std::string>(it, end);
+}
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	std::regex regexIP("(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])");
+	std::regex regexIPwithPort("(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d{1,2}|1\\d\\d|2[0-4]\\d|25[0-5]):[0-9]+");
+
+	std::string Ip;
+	int Port = -1;
+	while (true)
+	{
+		std::cout << "IP주소를 입력해주세요" << std::endl;
+
+		// space 받기 위해 getline 사용
+		std::getline(std::cin >> std::ws, Ip);
+
+		if ("Q" == Ip || "q" == Ip)
+			Ip = "127.0.0.1";
+
+		// 공백 예외처리
+		Ip.erase(std::remove_if(Ip.begin(), Ip.end(), isspace), Ip.end());
+
+		if (std::regex_match(Ip, regexIPwithPort)) // IP와 Port 포함 입력시
+		{
+			std::vector<std::string> splitStr = split(Ip, ":");
+			// IP / Port 추출
+			if (splitStr.size() == 2)
+			{
+				Ip = splitStr[0];
+				Port = std::stoi(splitStr[1]);
+
+				break;
+			}
+		}
+		else if (std::regex_match(Ip, regexIP)) // IP만 입력시
+		{
+			std::cout << "Port를 입력해주세요" << std::endl;
+			std::cin >> Port;
+
+			break;
+		}
+
+		std::cout << "Ip 주소가 잘못되었습니다." << std::endl;
+	}
+
+	std::cout << "입력이 완료 되었습니다." << std::endl;
+	std::cout << "IP : " << Ip << " PORT : "<< Port << std::endl;
+
 }
 
-// 프로그램 실행: <Ctrl+F5> 또는 [디버그] > [디버깅하지 않고 시작] 메뉴
-// 프로그램 디버그: <F5> 키 또는 [디버그] > [디버깅 시작] 메뉴
-
-// 시작을 위한 팁: 
-//   1. [솔루션 탐색기] 창을 사용하여 파일을 추가/관리합니다.
-//   2. [팀 탐색기] 창을 사용하여 소스 제어에 연결합니다.
-//   3. [출력] 창을 사용하여 빌드 출력 및 기타 메시지를 확인합니다.
-//   4. [오류 목록] 창을 사용하여 오류를 봅니다.
-//   5. [프로젝트] > [새 항목 추가]로 이동하여 새 코드 파일을 만들거나, [프로젝트] > [기존 항목 추가]로 이동하여 기존 코드 파일을 프로젝트에 추가합니다.
-//   6. 나중에 이 프로젝트를 다시 열려면 [파일] > [열기] > [프로젝트]로 이동하고 .sln 파일을 선택합니다.
